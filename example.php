@@ -23,33 +23,34 @@ require_once 'SmallMetric4PHP/SmallMetric4PHP.class.php';
 <?php
 
 // Init an object Start() is implied with init
-$sm4php = new \SmallMetric4PHP\SmallMetric4PHP('Me Example Datarun');
+$sm4php = new \SmallMetric4PHP\SmallMetric4PHP('My Example Datarun');
 
 // Here some action
 $dummy="";
-for($counter=0;$counter<230;$counter++) {
+for($counter=0;$counter<2370;$counter++) {
     // Use some CPU and alloc some Memory
     $dummy .= "onetwothree+";
 }
 // Simple Sleep some time (nearly half a second!)
-usleep(543);
+ usleep(500000);
+
 
 // Stop the lap time
 $sm4php->Fixpoint('First Stop');
 
 // Do some more action here
-for($counter=0;$counter<420;$counter++) {
+for($counter=0;$counter<4420;$counter++) {
     // Use some CPU and alloc some Memory
     $dummy .= "onetwothree+";
 }
 // Simple Sleep some more time zzzzz...
-usleep(742);
+usleep(350000);
 
 // Stop the whole action from here one we have time to print the results
-$sm4php->Fixpoint('Second Stop');
+$sm4php->Endpoint('Last Stop');
 
 // Show what we track on our way .....
-$sm4php->PrintResult();
+echo $sm4php->PrintResult();
 
 ?>
 <p>End of the Example Page!</p>

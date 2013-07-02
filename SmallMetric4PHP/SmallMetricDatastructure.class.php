@@ -15,6 +15,7 @@ class SmallMetricDatastructure {
 
     private $label;
     private $wallclocktime;
+    private $wallclocktimedelta;
 
     /**
      * Constructor simple store the values in private vars
@@ -27,6 +28,15 @@ class SmallMetricDatastructure {
     public function __construct($label, $wallclocktime) {
         $this->label=$label;
         $this->wallclocktime=$wallclocktime;
+    }
+
+    /**
+     * Set Delta Values between fixpoints
+     *
+     * @param $wallclocktimedelta
+     */
+    public function setDeltaValues($wallclocktimedelta) {
+        $this->wallclocktimedelta=$wallclocktimedelta;
     }
 
     /**
@@ -45,5 +55,14 @@ class SmallMetricDatastructure {
      */
     public function getWallclocktime() {
         return $this->wallclocktime;
+    }
+
+    /**
+     * Getterfunction for wallclocktimedelta
+     *
+     * @return double
+     */
+    public function getWallclocktimeDelta() {
+        return $this->wallclocktimedelta;
     }
 }

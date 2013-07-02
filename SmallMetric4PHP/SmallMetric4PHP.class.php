@@ -18,7 +18,9 @@ require_once __DIR__.'/SmallMetricDatastructure.class.php';
 class SmallMetric4PHP {
 
     private $collectionname;
-    private $fixpoints;
+
+    private $fixpoints;         // Array for all fixpoint objects
+    private $metricsum=null;    // Contain alle Values from start to end
 
     /**
      * Constructor init the object and start messuring
@@ -40,6 +42,58 @@ class SmallMetric4PHP {
     }
 
     /**
+     * End messuring and calculate values
+     *
+     * @param String $label optional label for endpoint name
+     *
+     * @return bool
+     */
+    public function Endpoint($label='End') {
+        if($this->metricsum!=null) {
+            echo "ERROR: Messuring allready ended!";
+            return false;
+        }
+
+        // First Step fix the endtime
+        $this->Fixpoint($label);
+
+        // Deltacounter
+        $wctdelta = null;
+
+        // Go thru an sum things up
+        foreach($this->fixpoints AS $fixpointobjekt) {
+            if($wctdelta!=null) {
+                // Not the first run, calculate different
+                $tempwctdelta = $this->MillisecondDelta($wctdelta,$fixpointobjekt->getWallclocktime());
+            } else {
+                // first point, setzt delta to zero
+                $tempwctdelta = 0;
+            }
+
+            // store delta in object
+            $fixpointobjekt->setDeltaValues($tempwctdelta);
+
+            // save time for next run in var
+            $wctdelta = $fixpointobjekt->getWallclocktime();
+        }
+
+        // Sum times UP
+        $first_fixpoint_obj=reset($this->fixpoints);
+        $last_fixpoint_obj=end($this->fixpoints);
+
+        // Delta first to last
+        $wctdelta = $this->MillisecondDelta($first_fixpoint_obj->getWallclocktime(),
+                                            $last_fixpoint_obj->getWallclocktime());
+
+        // Store in special last Objekt
+        $this->metricsum = new SmallMetricDatastructure('Sum',null);
+        $this->metricsum->setDeltaValues($wctdelta);
+
+        // Everything works fine
+        return true;
+    }
+
+    /**
      * Fix values for metric at this point
      *
      * @param string $label Name of the Fixpoint
@@ -56,18 +110,51 @@ class SmallMetric4PHP {
     }
 
     /**
-     * End messuring
+     *  Print a small table with calculatet values of the run
      *
-     * @param String $label optional label for endpoint name
-     *
-     * @return null
+     *  @return string Table html
      */
-    public function Endpoint($label='End') {
+    public function PrintResult() {
+        // Check if mesuring has end
+        if($this->metricsum==null) {
+            // TODO: Maybe implicit endcall here
+            echo "ERROR: Mesuring still running!";
+            return false;
+        }
 
+        // TODO: Better HTML CSS
+        $html  = "<table style='border:#000 1px solid; border-collapse: collapse;'>";
+        $html .= "<tr style='border:#000 1px solid; border-collapse: collapse;'>";
+        $html .= "<td style='border-right:#000 1px solid; border-collapse: collapse;'><b><u>".$this->collectionname."</u></b></td>";
+        $html .= "<td><b>Deltatime</b></td>";
+        $html .= "</tr>";
+        foreach($this->fixpoints AS $fixpointobjekt) {
+            $html .= "<tr style='border:#000 1px solid; border-collapse: collapse;'>";
+            $html .= "<td style='border-right:#000 1px solid; border-collapse: collapse;'>".$fixpointobjekt->getLabel()."</td>";
+            $html .= "<td>".$fixpointobjekt->getWallclocktimeDelta()." s</td>";
+            $html .= "</tr>";
+        }
+        $html .= "<tr style='border-top:#000 1px double; border-collapse: collapse;'>";
+        $html .= "<td style='border-right:#000 1px solid; border-collapse: collapse;'><b>".$this->metricsum->getLabel()."</b></td>";
+        $html .= "<td><b>".$this->metricsum->getWallclocktimeDelta()." s</b></td>";
+        $html .= "</tr>";
+        $html .= "</table>";
+
+        return $html;
     }
 
-    public function PrintResult() {
+    /**
+     * Calculate the differenz between two millisecond timestamps
+     *
+     * @param $starttime
+     * @param $endtime
+     * @return string
+     */
+    private function MillisecondDelta($starttime,$endtime) {
+        $deltatime = $endtime-$starttime;
+        $deltatime = substr($deltatime,0,8);
 
+        return $deltatime;
     }
 
     /**
