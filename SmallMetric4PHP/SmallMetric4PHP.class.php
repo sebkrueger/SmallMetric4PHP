@@ -152,20 +152,20 @@ class SmallMetric4PHP {
      */
     private function MillisecondDelta($starttime,$endtime) {
         $deltatime = $endtime-$starttime;
-        $deltatime = substr($deltatime,0,8);
+        $deltatime = round($deltatime,4);
 
         return $deltatime;
     }
 
     /**
-     * Retrun now timestamp in seconds with mircseconds
+     * Return now() timestamp in seconds with mircseconds
      *
      * @return double Timestamp with seconds and mircoseconds
      */
     private function getWallclockMicrotime() {
         $probetime = microtime();
         $timecomponents = explode(" ",$probetime);
-        return $timecomponents[0] + $timecomponents[1];
+        return ((float)$timecomponents[0] + (float)$timecomponents[1]);
     }
 
     /**
